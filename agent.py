@@ -15,7 +15,7 @@ def load_history():
     history_path = BASE_DIR / "history.json "
     if history_path.exists():
         try:
-            with open("history.json", "r", encoding="utf-8") as f:
+            with open(history_path, "r", encoding="utf-8") as f:
                 return json.load(f)
         except json.JSONDecodeError:
             return []
