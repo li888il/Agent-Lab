@@ -1,46 +1,19 @@
 import os
 import json
 from openai import OpenAI
-
+from tools import TOOLS
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent
 
 # ================= 1. 本地工具函数 =================
 
-def write_note(filename, content):
-    """把 AI 提取出的内容写入 notes/ 目录，返回写入结果"""
-    os.makedirs("../../notes", exist_ok=True)
-    safe_name = os.path.basename(filename)
-    path = os.path.join("../../notes", safe_name)
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(content)
-    return f"写入成功: {path}"
+#已搬走至tools.py
 
-# 👇 get_grades 就在这，紧挨着上面 👇
-MOCK_GRADES = {
-    "张三": {"数学": 90, "英语": 85},
-    "李四": {"数学": 78, "英语": 92}
-}
-
-def get_grades(name, subject):
-    try:
-        score = MOCK_GRADES[name][subject]
-        return f"{name}的{subject}成绩是：{score}分"
-    except KeyError:
-        return f"查不到{name}的{subject}成绩。"
-# 👆 到这里结束 👆
-def clear_history():
-    with open("history.json", "w", encoding="utf-8") as f:
-        json.dump([],f)
-    return "历史记录已清空"
-# 👇 然后是注册表 👇
-TOOLS = {
-    "write_note": write_note,
-    "get_grades": get_grades,
-    "clear_history": clear_history  # 新增的
-}
 
 # ================= 2. 历史记忆函数 =================
 def load_history():
-    if os.path.exists("history.json"):
+    history_path = BASE_DIR / "history.json "
+    if history_path.exists():
         try:
             with open("history.json", "r", encoding="utf-8") as f:
                 return json.load(f)
@@ -49,7 +22,8 @@ def load_history():
     return []
 
 def save_history(history):
-    with open("history.json", "w", encoding="utf-8") as f:
+    history_path = BASE_DIR / "history.json "
+    with open(history_path, "w", encoding="utf-8") as f:
         json.dump(history, f, ensure_ascii=False, indent=2)
 
 # ================= 3. Agent 核心类 =================
@@ -140,11 +114,16 @@ class Agent:
                         self.history = [{"role": "system", "content": self.system_prompt}]
 
                     final_answer = f"[系统提示] {result}"
+
+
                 except KeyError as e:
                     # 【反馈型·不抹】请求已发、user 有效，不 pop；
                     # 只把失败原因留给 D 步写成 assistant，给模型下轮修正的依据
                     print(f"[工具参数缺失]: {e}")
                     final_answer = f"工具执行失败：大模型漏掉了必要的参数 {e}"
+
+            #模型瞎编了个不存在的工具名（幻觉），也是json格式，需要else兜住
+            else:final_answer = ai_reply
 
         except json.JSONDecodeError:
             final_answer = ai_reply
