@@ -81,7 +81,7 @@ class Agent:
         #for msg in messages_to_send:
             #print(f"[{msg['role']}] {msg['content']}")
         #print("========================")
-
+        print(f"[系统]已发送{len(messages_to_send)}")
         # B. 调模型
         try:
             response = self.client.chat.completions.create(
