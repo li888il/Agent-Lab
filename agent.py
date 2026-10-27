@@ -77,10 +77,7 @@ class Agent:
 
         # 👆 截断逻辑结束 👆
 
-        #print("=== 我要发出去的包裹 ===")
-        #for msg in messages_to_send:
-            #print(f"[{msg['role']}] {msg['content']}")
-        #print("========================")
+        #测试截断，代替了原先展现message_to_send的详细内容
         print(f"[系统]已发送{len(messages_to_send)}")
         # B. 调模型
         try:
@@ -90,13 +87,10 @@ class Agent:
                 stream=False
             )
             ai_reply = response.choices[0].message.content
-        #except Exception as e:
-        #    # 网络断了的错误恢复
-        #    final_answer = "抱歉，网络连接失败，请再说一遍。"
-        #    self.history.pop()
-        #    print(f"[网络异常]: {e}")
-        #    return final_answer
-        #    以下进行精确错位置定位升级
+
+        # 网络断了的错误恢复
+        #原先都为except Exception as e,未作划分
+        #以下进行精确错位置定位升级
         except openai.AuthenticationError:
             print("[异常]: 鉴权失败，API Key 填错了！")
             self.history.pop()
