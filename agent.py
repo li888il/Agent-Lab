@@ -1,9 +1,16 @@
 import os
+
+import openai
+from dotenv import load_dotenv
 import json
 from openai import OpenAI
 from tools import TOOLS
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
+
+
+load_dotenv()  # 自动去读同目录下的 .env 文件，把里面的变量塞进环境
+
 
 # ================= 1. 本地工具函数 =================
 
@@ -12,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent
 
 # ================= 2. 历史记忆函数 =================
 def load_history():
-    history_path = BASE_DIR / "history.json "
+    history_path = BASE_DIR / "history.json"
     if history_path.exists():
         try:
             with open(history_path, "r", encoding="utf-8") as f:
@@ -83,12 +90,32 @@ class Agent:
                 stream=False
             )
             ai_reply = response.choices[0].message.content
-        except Exception as e:
-            # 网络断了的错误恢复
-            final_answer = "抱歉，网络连接失败，请再说一遍。"
+        #except Exception as e:
+        #    # 网络断了的错误恢复
+        #    final_answer = "抱歉，网络连接失败，请再说一遍。"
+        #    self.history.pop()
+        #    print(f"[网络异常]: {e}")
+        #    return final_answer
+        #    以下进行精确错位置定位升级
+        except openai.AuthenticationError:
+            print("[异常]: 鉴权失败，API Key 填错了！")
             self.history.pop()
-            print(f"[网络异常]: {e}")
-            return final_answer
+            return "抱歉，系统配置有误，请联系管理员（Key错误）。"
+
+        except openai.RateLimitError:
+            print("[异常]: 额度不足或请求频率过高。")
+            self.history.pop()
+            return "抱歉，AI 大脑今天太累了，请稍后再试（欠费/限流）。"
+
+        except openai.APIConnectionError:
+            print("[异常]: 网络断了。")
+            self.history.pop()
+            return "抱歉，网络连接失败，请检查您的网络。"
+
+        except Exception as e:
+            print(f"[未知错误]: {e}")
+            self.history.pop()
+            return "系统开小差了，请稍后再试。"
         # C. 路由：JSON 工具指令 or 普通聊天
         text = ai_reply.strip()                 # 去首尾空白，防解析失败
         try:

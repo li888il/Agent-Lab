@@ -4,7 +4,6 @@ import os
 from pathlib import Path
 from agent import Agent
 
-import os
 os.environ["DEEPSEEK_API_KEY"] = "sk-fake-key-just-for-test" # 强行塞个假钥匙
 
 # 伪造一个假大模型的回复，专门用来骗过 API 请求
