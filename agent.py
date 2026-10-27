@@ -77,10 +77,10 @@ class Agent:
 
         # 👆 截断逻辑结束 👆
 
-        print("=== 我要发出去的包裹 ===")
-        for msg in messages_to_send:
-            print(f"[{msg['role']}] {msg['content']}")
-        print("========================")
+        #print("=== 我要发出去的包裹 ===")
+        #for msg in messages_to_send:
+            #print(f"[{msg['role']}] {msg['content']}")
+        #print("========================")
 
         # B. 调模型
         try:
