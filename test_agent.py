@@ -59,7 +59,7 @@ def test_tools_registry_has_three_tools():
 
 # 2. 测查成绩
 def test_get_grades():
-    assert "90" in get_grades("张三", "数学")
+    assert "67" in get_grades("张三", "数学")
     assert "查不到" in get_grades("王五", "数学")
 
 

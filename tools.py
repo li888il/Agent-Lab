@@ -1,14 +1,15 @@
 import json
 from pathlib import Path
+
+from openai.types.graders import score_model_grader_param
+
 BASE_DIR = Path(__file__).resolve().parent#获得绝对路径
+import sqlite3
 
 #对tool进行分离，移动至当前文件夹
 # 👇 get_grades 就在这，紧挨着上面 👇
-MOCK_GRADES = {
-    "张三": {"数学": 90, "英语": 85},
-    "李四": {"数学": 78, "英语": 92}
-}
 
+#引入数据库，去除假字典MOCK_GRADES
 
 # 1. 以前用 os.path.join("notes", filename) 拼字符串容易错，现在直接用斜杠 / 拼接，清爽直观。
 # 2. os 还要管 Windows 的反斜杠 \，现在 pathlib 自动适配全平台，写一个 / 走天下。
@@ -26,11 +27,32 @@ def write_note(filename, content):
 
 
 def get_grades(name, subject):
+    conn =None    #【防崩护体】先占个坑，防止连库第一行就炸了，导致 finally 报错
+                # 最后 finally 里找不到conn就会直接报 NameError 原地崩溃
     try:
-        score = MOCK_GRADES[name][subject]
-        return f"{name}的{subject}成绩是：{score}分"
-    except KeyError:
-        return f"查不到{name}的{subject}成绩。"
+        conn = sqlite3.connect(BASE_DIR /"grades.db")
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT score FROM scores WHERE name=? AND subject=?", (name, subject))
+        # 提取结果（返回的是个元组，比如 (67,)）
+        result = cursor.fetchone()
+
+        if result:
+            return f"{name}的{subject}成绩是：{result[0]}分"
+        else :
+            return f"查不到{name}的{subject}成绩"
+    except Exception as e:
+        # 【大网眼兜底】别用 KeyError，数据库报错五花八门，用 Exception 全兜住，防程序崩溃
+
+        return"数据库报错,请稍后再试"
+    finally:
+        if conn:
+            #与条件判断逻辑不同，不存在就报错
+            conn.close()
+        #【防死锁铁律】不管上面是报错了还是成功，只要 conn 存在（连上了），走之前必须关门！
+        #防止第一行就报错了，电脑突然没权限了，或者路径乱码了，导致根本没连上数据库
+
+
 # 👆 到这里结束 👆
 def clear_history():
     history_path = BASE_DIR / "history.json"
