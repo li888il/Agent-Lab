@@ -1,5 +1,5 @@
 import os
-
+import time
 import openai
 from dotenv import load_dotenv
 import json
@@ -84,9 +84,17 @@ class Agent:
             response = self.client.chat.completions.create(
                 model="deepseek-chat",
                 messages=messages_to_send,
-                stream=False
+                stream=True
             )
-            ai_reply = response.choices[0].message.content
+            # 换成流式遍历
+            ai_reply = ""
+            print("Agent: ", end="", flush=True)
+            for chunk in response:
+                content = chunk.choices[0].delta.content
+                if content:
+                    ai_reply += content
+                    print(content, end="", flush=True)
+            print()  # 打印完换行
 
         # 网络断了的错误恢复
         #原先都为except Exception as e,未作划分
@@ -165,6 +173,6 @@ if __name__ == "__main__":
             break
         try:
             reply = agent.reply(user_input)
-            print(f"Agent: {reply}\n")
+            print()
         except Exception as e:
             print(f"[报错]: {e}\n")

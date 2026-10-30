@@ -43,8 +43,8 @@ def get_grades(name, subject):
             return f"查不到{name}的{subject}成绩"
     except Exception as e:
         # 【大网眼兜底】别用 KeyError，数据库报错五花八门，用 Exception 全兜住，防程序崩溃
-
-        return"数据库报错,请稍后再试"
+                print(f"[错误提示]:{e}")
+                return"数据库报错,请稍后再试"
     finally:
         if conn:
             #与条件判断逻辑不同，不存在就报错

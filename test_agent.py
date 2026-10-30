@@ -22,15 +22,27 @@ class FakeResponse:
         self.choices = [FakeChoice(content)]
 
 
+# 1. 模拟流式吐出的每一个“水滴”
+class FakeStreamChunk:
+    def __init__(self, content):
+        # 模拟 delta 结构：chunk.choices[0].delta.content
+        self.choices = [type('Choice', (), {'delta': type('Delta', (), {'content': content})})]
+
+# 2. 假客户端（注意看 create 方法里的 yield）
 class FakeClient:
     def __init__(self, fake_reply):
         self.fake_reply = fake_reply
-        self.chat = self  # 骗代码说我有 chat 属性
-        self.completions = self  # 骗代码说我有 completions 属性
+        self.chat = self
+        self.completions = self
 
     def create(self, *args, **kwargs):
-        # 当 agent 呼叫 create 时，直接把假回复甩给它
-        return FakeResponse(self.fake_reply)
+        # 大白话：只要 agent.py 敢用 for 循环遍历，我就把一个长句子
+        # 拆成一个个字，像挤牙膏一样 yield 出去。
+        def stream_generator():
+            for char in self.fake_reply:
+                yield FakeStreamChunk(char)
+        return stream_generator()
+
 
 
 # 测核心逻辑：假大模型让存笔记，看代码有没有真存
