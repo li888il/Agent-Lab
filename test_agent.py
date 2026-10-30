@@ -57,8 +57,11 @@ def test_agent_reply_with_tool():
     agent.client = FakeClient(fake_json)
 
     # 4. 触发回复
-    result = agent.reply("帮我记个笔记")
+    # 核心：用 "".join() 把生成器里蹦出来的每一个字，重新拼成一整段话！
+    result = "".join(agent.reply("帮我记个笔记"))
 
+    # 然后再去断言
+    assert "写入成功" in result
     # 5. 断言：看代码是不是真的执行了工具并返回了成功
     assert "写入成功" in result
 
