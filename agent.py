@@ -1,11 +1,13 @@
+import json
 import os
-import time
+from pathlib import Path
+
 import openai
 from dotenv import load_dotenv
-import json
 from openai import OpenAI
+
 from tools import TOOLS
-from pathlib import Path
+MAX_HISTORY = 10
 BASE_DIR = Path(__file__).resolve().parent
 
 
@@ -29,7 +31,7 @@ def load_history():
     return []
 
 def save_history(history):
-    history_path = BASE_DIR / "history.json "
+    history_path = BASE_DIR / "history.json"
     with open(history_path, "w", encoding="utf-8") as f:
         json.dump(history, f, ensure_ascii=False, indent=2)
 
@@ -68,9 +70,9 @@ class Agent:
 
         #  这是今天新加的截断逻辑（5行代码）
         # 只保留最近的 5 轮对话（10条消息），防止历史无限膨胀
-        if len(self.history) > 11:  # 1条system + 10条最新的对话
+        if len(self.history) > MAX_HISTORY + 1:
             system_msg = self.history[0]
-            recent_msgs = self.history[-10:]  # 取最后10条，保持原顺序
+            recent_msgs = self.history[-MAX_HISTORY:]
             messages_to_send = [system_msg] + recent_msgs
         else:
             messages_to_send = self.history
@@ -97,7 +99,7 @@ class Agent:
                     # 【10.30新增】判断一下：如果不是工具指令（不是以 { 开头），就把字流式发给网页
                     if not ai_reply.strip().startswith("{"):
                         yield content
-                print()# 打印完换行
+            print()# 打印完换行
 
 
         # 网络断了的错误恢复
@@ -139,32 +141,32 @@ class Agent:
 
             # 2. 如果这个工具在我们的注册表里
             if tool_name in TOOLS:
-                is_tool_call = True # 确定是调工具，标记翻转
+                is_tool_call = True  # 确定是调工具，标记翻转
                 func = TOOLS[tool_name]
                 try:
+                    # 剔除 tool 字段，剩下的参数作为 kwargs 解包传入
+                    args = {k: v for k, v in data.items() if k != "tool"}
+                    result = func(**args)
 
-                    if tool_name == "write_note":
-                        result = func(data["filename"], data["content"])
-                    elif tool_name == "get_grades":
-                        result = func(data["name"], data["subject"])
-                    elif tool_name == "clear_history":
-                        result = func()  # 不需要传任何参数
-
-                        # 【核心坑位】：立刻清空内存里的 self.history，只保留 system！
-                        # 否则走到最后一步 D 存盘时，又把这个对话存进去了
+                    # 特殊处理 clear_history 的内存重置
+                    if tool_name == "clear_history":
                         self.history = [{"role": "system", "content": self.system_prompt}]
 
                     final_answer = f"\n\n[系统提示] {result}"
 
-
                 except KeyError as e:
                     # 【反馈型·不抹】请求已发、user 有效，不 pop；
-                    # 只把失败原因留给 D 步写成 assistant，给模型下轮修正的依据
+                    # 只把失败原因留给 D步写成 assistant，给模型下轮修正的依据
                     print(f"[工具参数缺失]: {e}")
                     final_answer = f"工具执行失败：大模型漏掉了必要的参数 {e}"
 
-            #模型瞎编了个不存在的工具名（幻觉），也是json格式，需要else兜住
-            else:final_answer = ai_reply
+            # 模型瞎编了个不存在的工具名（幻觉），也是json格式，需要else兜住
+            else:
+                final_answer = ai_reply
+
+
+
+
 
         except json.JSONDecodeError:
             final_answer = ai_reply

@@ -28,7 +28,7 @@ class FakeStreamChunk:
         # 模拟 delta 结构：chunk.choices[0].delta.content
         self.choices = [type('Choice', (), {'delta': type('Delta', (), {'content': content})})]
 
-# 2. 假客户端（注意看 create 方法里的 yield）
+# 2. 假客户端
 class FakeClient:
     def __init__(self, fake_reply):
         self.fake_reply = fake_reply
@@ -36,8 +36,8 @@ class FakeClient:
         self.completions = self
 
     def create(self, *args, **kwargs):
-        # 大白话：只要 agent.py 敢用 for 循环遍历，我就把一个长句子
-        # 拆成一个个字，像挤牙膏一样 yield 出去。
+        # agent.py 用 for 循环遍历，就把一个长句子
+        # 拆成一个个字，yield 出去。
         def stream_generator():
             for char in self.fake_reply:
                 yield FakeStreamChunk(char)

@@ -1,12 +1,10 @@
 from dotenv import load_dotenv
 load_dotenv()  # 强行让网页环境也去读一下 .env 文件
 
-
-# ... 下面保持你的代码不变 ...
 import streamlit as st
 from agent import Agent
 # 设置网页标题
-st.title("🤖 我的 AI Agent 控制台")
+st.title(" 我的 AI Agent 控制台")
 
 # 使用 cache_resource 防止 Streamlit 每次刷新网页时都重新实例化 Agent 导致历史记录丢失
 @st.cache_resource
