@@ -28,3 +28,34 @@ Agent-Lab/
 ├── test_app.py        # Streamlit 网页端自动化测试
 ├── requirements.txt   # 依赖清单
 └── .env.example       # 环境变量模板
+
+快速开始
+
+1. 安装依赖
+
+```bash
+pip install -r requirements.txt
+```
+
+2. 配置环境变量
+
+复制 .env.example 为 .env，填入真实的 API Key：
+
+```env
+DEEPSEEK_API_KEY=your_api_key_here
+```
+
+3. 初始化数据库并启动
+
+```bash
+python init_db.py
+streamlit run app.py
+```
+
+4. 运行测试
+
+```bash
+python -m pytest -q
+```
+
+```
