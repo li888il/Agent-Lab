@@ -80,6 +80,7 @@ class Agent:
         #  截断逻辑结束
 
         #测试截断，代替了原先展现message_to_send的详细内容
+        #由于streamlit这句也就没用了罢
         print(f"[系统]已发送{len(messages_to_send)}")
         # B. 调模型
         try:
@@ -154,19 +155,22 @@ class Agent:
 
                     final_answer = f"\n\n[系统提示] {result}"
 
-                except KeyError as e:
-                    # 【反馈型·不抹】请求已发、user 有效，不 pop；
-                    # 只把失败原因留给 D步写成 assistant，给模型下轮修正的依据
-                    print(f"[工具参数缺失]: {e}")
-                    final_answer = f"工具执行失败：大模型漏掉了必要的参数 {e}"
 
+
+                except (KeyError, TypeError) as e:
+                    # 【核心升级】同时捕获 KeyError (字典缺键) 和 TypeError (参数类型/数量不对)
+                    # 【反馈型·不抹】请求已发、user 有效，不 pop；
+                    # 只把失败原因留给 D 步写成 assistant，给模型下轮修正的依据
+                    print(f"[工具参数异常]: {e}")
+                    final_answer = f"工具执行失败：大模型输出的参数不匹配 ({e})"
+
+                except Exception as e:
+                    # 兜底其他未知异常（比如网络断了、硬件没开机）
+                    print(f"[工具执行异常]: {e}")
+                    final_answer = f"工具执行失败：大模型漏掉了必要的参数 {e}"
             # 模型瞎编了个不存在的工具名（幻觉），也是json格式，需要else兜住
             else:
                 final_answer = ai_reply
-
-
-
-
 
         except json.JSONDecodeError:
             final_answer = ai_reply

@@ -1,8 +1,7 @@
 import json
 from pathlib import Path
-
-from openai.types.graders import score_model_grader_param
-
+import os
+import requests
 BASE_DIR = Path(__file__).resolve().parent#获得绝对路径
 import sqlite3
 
@@ -14,7 +13,6 @@ import sqlite3
 # 2. os 还要管 Windows 的反斜杠 \，现在 pathlib 自动适配全平台，写一个 / 走天下。
 # 3. 以前判断文件得写 os.path.exists()，现在是面向对象，直接调属性 history_path.exists()。
 # os 是散装函数，pathlib 是面向对象，代码短且防炸裂
-
 
 
 def write_note(filename, content):

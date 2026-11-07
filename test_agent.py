@@ -22,7 +22,7 @@ class FakeResponse:
         self.choices = [FakeChoice(content)]
 
 
-# 1. 模拟流式吐出的每一个“水滴”
+# 模拟流式吐出的每一个词元
 class FakeStreamChunk:
     def __init__(self, content):
         # 模拟 delta 结构：chunk.choices[0].delta.content
@@ -36,8 +36,8 @@ class FakeClient:
         self.completions = self
 
     def create(self, *args, **kwargs):
-        # agent.py 用 for 循环遍历，就把一个长句子
-        # 拆成一个个字，yield 出去。
+        # agent.py 用 for 循环遍历，就把一个长句子拆成一个个字，yield 出去。
+
         def stream_generator():
             for char in self.fake_reply:
                 yield FakeStreamChunk(char)

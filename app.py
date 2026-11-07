@@ -3,8 +3,27 @@ load_dotenv()  # 强行让网页环境也去读一下 .env 文件
 
 import streamlit as st
 from agent import Agent
+import sqlite3
+from pathlib import Path
+
+# 侧边栏清空按钮
+st.sidebar.title("控制面板")
+if st.sidebar.button("清空对话记录"):
+    st.session_state.messages = []
+    # 调用工具清空本地文件
+    from tools import clear_history
+    clear_history()
+    st.rerun() # 强制刷新网页
+
+# 侧边栏数据库统计
+conn = sqlite3.connect(Path(__file__).parent / "grades.db")
+cursor = conn.cursor()
+cursor.execute("SELECT COUNT(*) FROM scores")
+count = cursor.fetchone()[0]
+conn.close()
+st.sidebar.write(f"当前成绩库记录数：**{count}** 条")
 # 设置网页标题
-st.title(" 我的 AI Agent 控制台")
+st.title("AI Agent 控制台")
 
 # 使用 cache_resource 防止 Streamlit 每次刷新网页时都重新实例化 Agent 导致历史记录丢失
 @st.cache_resource
