@@ -58,4 +58,3 @@ streamlit run app.py
 python -m pytest -q
 ```
 
-```
