@@ -28,7 +28,8 @@ Agent-Lab/
 ├── test_app.py        # Streamlit 网页端自动化测试
 ├── requirements.txt   # 依赖清单
 └── .env.example       # 环境变量模板
-'''
+```
+
 快速开始
 
 1. 安装依赖
