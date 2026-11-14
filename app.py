@@ -1,3 +1,4 @@
+import requests
 from dotenv import load_dotenv
 load_dotenv()  # 强行让网页环境也去读一下 .env 文件
 
@@ -49,11 +50,18 @@ if prompt := st.chat_input("请输入你的问题..."):
 
     # 2. 调用你真正的 Agent
     with st.chat_message("assistant"):
-        with st.spinner("AI 思考中..."):
-            # 这里调用的就是 agent.py 里的 reply 方法
-            reply = agent.reply(prompt)
-            # 把回复显示在网页上
-            st.write(reply)
+        payload = {"message": prompt}
+        res = requests.post("http://127.0.0.1:8000/chat", json=payload, stream=True)
 
-    # 3. 把 AI 的回复也存进网页历史
-    st.session_state.messages.append({"role": "assistant", "content": reply})
+
+        # 核心修改：写个小生成器，把字节流解码成中文字符串
+        def decode_stream():
+            for chunk in res.iter_content(chunk_size=None):
+                if chunk:
+                    yield chunk.decode('utf-8')
+
+
+        # 把解码后的水管子交给网页
+        response = st.write_stream(decode_stream())
+    # 把 AI 完整回复存进网页的历史记录里
+    st.session_state.messages.append({"role": "assistant", "content": response})

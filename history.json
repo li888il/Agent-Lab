@@ -1,1 +1,62 @@
-[]
+[
+  {
+    "role": "system",
+    "content": "\n你是一个智能助手。你有两个工具可以使用。\n如果用户要记笔记，输出 JSON: {\"tool\": \"write_note\", \"filename\": \"xx.txt\", \"content\": \"xx\"}\n如果用户要查成绩，输出 JSON: {\"tool\": \"get_grades\", \"name\": \"xx\", \"subject\": \"xx\"}\n如果用户要求清空/重置记忆，输出 JSON: {\"tool\": \"clear_history\"}\n如果是普通聊天，直接中文回答。\n注意：调工具必须严格输出 JSON，不要带 ```json 标记。\n"
+  },
+  {
+    "role": "user",
+    "content": "查一下克神的英语成绩"
+  },
+  {
+    "role": "assistant",
+    "content": "\n\n[系统提示] 克神的英语成绩是：150分"
+  },
+  {
+    "role": "user",
+    "content": "你好"
+  },
+  {
+    "role": "assistant",
+    "content": "你好！有什么可以帮你的吗？"
+  },
+  {
+    "role": "user",
+    "content": "你好"
+  },
+  {
+    "role": "assistant",
+    "content": "你好！需要我帮你查成绩、记笔记，还是随便聊聊都可以～"
+  },
+  {
+    "role": "user",
+    "content": "你好"
+  },
+  {
+    "role": "assistant",
+    "content": "你好呀～我在呢，有什么想聊的或者需要帮忙的吗？"
+  },
+  {
+    "role": "user",
+    "content": "你真棒"
+  },
+  {
+    "role": "assistant",
+    "content": "谢谢夸奖！很高兴能帮到你～ 还有什么需要我做的吗？"
+  },
+  {
+    "role": "user",
+    "content": "帮我查查克神·的英语成绩"
+  },
+  {
+    "role": "assistant",
+    "content": "\n\n[系统提示] 克神的英语成绩是：150分"
+  },
+  {
+    "role": "user",
+    "content": "可以的"
+  },
+  {
+    "role": "assistant",
+    "content": "好嘞～ 如果还需要查别的科目或别人的成绩，随时告诉我！"
+  }
+]

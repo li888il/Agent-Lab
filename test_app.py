@@ -19,4 +19,4 @@ def test_app_sidebar_clear_button():
     clear_btn.click()
     at.run()
     # 6. 按钮点击后，网页会自动重跑，检查记录是不是被清空了
-    assert len(at.session_state["messages"]) == 0
+    assert len(at.session_state.get("messages", [])) == 0
