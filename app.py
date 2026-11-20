@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()  # 强行让网页环境也去读一下 .env 文件
 
 import streamlit as st
-from agent import Agent
+
 import sqlite3
 from pathlib import Path
 
@@ -27,11 +27,8 @@ st.sidebar.write(f"当前成绩库记录数：**{count}** 条")
 st.title("AI Agent 控制台")
 
 # 使用 cache_resource 防止 Streamlit 每次刷新网页时都重新实例化 Agent 导致历史记录丢失
-@st.cache_resource
-def get_agent():
-    return Agent()
+#接入fastapi故删去
 
-agent = get_agent()
 # 初始化聊天记录（专门给网页用的）
 if "messages" not in st.session_state:
     st.session_state.messages = []
