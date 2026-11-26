@@ -58,5 +58,37 @@
   {
     "role": "assistant",
     "content": "好嘞～ 如果还需要查别的科目或别人的成绩，随时告诉我！"
+  },
+  {
+    "role": "user",
+    "content": "记一下我明天九点的会议"
+  },
+  {
+    "role": "assistant",
+    "content": "\n\n[系统提示] 写入成功: C:\\Users\\MECHREVO\\Desktop\\Agent-Lab\\Agent-Lab\\notes\\会议提醒.txt"
+  },
+  {
+    "role": "user",
+    "content": "你好，请用一句话介绍你自己"
+  },
+  {
+    "role": "assistant",
+    "content": "你好！我是一个能陪你聊天、帮你记笔记和查成绩的智能助手。"
+  },
+  {
+    "role": "user",
+    "content": "hello"
+  },
+  {
+    "role": "assistant",
+    "content": "Hello！有什么我可以帮你的吗？😊"
+  },
+  {
+    "role": "user",
+    "content": "你好"
+  },
+  {
+    "role": "assistant",
+    "content": "你好！需要我帮你记笔记、查成绩，还是随便聊聊？😊"
   }
 ]
