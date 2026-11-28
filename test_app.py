@@ -1,4 +1,5 @@
 from streamlit.testing.v1 import AppTest
+import requests
 
 def test_app_sidebar_clear_button():
     # 1. 启动网页（此时会自动执行 app.py）
@@ -20,3 +21,25 @@ def test_app_sidebar_clear_button():
     at.run()
     # 6. 按钮点击后，网页会自动重跑，检查记录是不是被清空了
     assert len(at.session_state.get("messages", [])) == 0
+
+
+
+class FakeResp:
+    status_code = 200
+
+    def iter_content(self, chunk_size=None):
+        raw = "你好".encode("utf-8")
+        yield raw[:2]
+        yield raw[2:]
+
+
+def test_聊天输入走后端(monkeypatch):
+    monkeypatch.setattr(requests, "post", lambda *a, **k: FakeResp())
+
+    at = AppTest.from_file("app.py").run()
+    at.chat_input[0].set_value("你好").run()
+
+    assert not at.exception
+    assert len(at.session_state["messages"]) == 2
+    assert "你好" in at.session_state["messages"][1]["content"]
+
